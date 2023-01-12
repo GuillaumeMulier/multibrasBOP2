@@ -1,0 +1,31 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# multibrasBOP2
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Package of functions to implement the BOP2 design from Zhou et al. and extend it to multi-arm multi-stage settings.
+
+# Installation
+
+Installation on github
+
+``` r
+# install.packages("devtools")
+devtools::install_github("GuillaumeMulier/multibrasBOP2")
+```
+
