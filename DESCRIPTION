@@ -1,15 +1,17 @@
 Package: multibrasBOP2
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Simulate data and apply BOP2 design and extension to MAMS
+Version: 0.0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Guillaume",
+           family = "Mulier",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+           email = "DRY12@hotmail.fr",
+           comment = c(ORCID = "0000-0003-4036-7723")),
+    person(given = "Lucie",
+           family = "Biard",
+           role = c("cre"))
+Description: Simulate data with multinomial distribution and analyse them using BOP2 design, TOP design and extension of BOP2 to MAMS.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -6,14 +6,17 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-L’objectif du travail du master est de voir comment se comporte le
-design bayésien BOP2 pour des essais à plusieurs bras.
+Package of functions to implement the BOP2 design from Zhou et al. and
+extend it to multi-arm multi-stage settings.
 
-## Installation
+Huge thanks to Ruitao Lin for sharing his code for TOP with us and all
+his advices on the work, as well as his contribution for the articles.
 
-Pour l’instant uniquement sur github
+# Installation
+
+Installation on github
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("GuillaumeMulier/multibrasBOP2", auth_token = "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")
+devtools::install_github("GuillaumeMulier/multibrasBOP2")
 ```

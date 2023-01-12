@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 
 Package of functions to implement the BOP2 design from Zhou et al. and extend it to multi-arm multi-stage settings.
 
+Huge thanks to Ruitao Lin for sharing his code for TOP with us and all his advices on the work, as well as his contribution for the articles.
+
 # Installation
 
 Installation on github
