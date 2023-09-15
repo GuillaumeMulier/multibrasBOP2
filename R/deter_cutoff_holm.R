@@ -72,7 +72,7 @@ get_stopbound_holm2 <- function(ana_inter,
     if (length(prior) != 4)
       stop("\"prior\" should be a vector of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("\"prior\" should sum to 1 as it is a law of probability.", call. = FALSE)
+      warning("\"prior\" should sum to 1 as it is a law of probability.")
   }
   if (length(unique(rand_ratio)) == 1 & length(rand_ratio) > 1) rand_ratio <- rand_ratio[1]
 

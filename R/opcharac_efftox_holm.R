@@ -94,7 +94,7 @@ opcharac_efftox_holm2 <- function(alpha = .1,
     if (length(prior) != 4)
       stop("Vector \"prior\" should be of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("Vector \"prior\" should sum to 1.", call. = FALSE)
+      warning("Vector \"prior\" should sum to 1.")
   }
   if (!dplyr::near(sum(p_a), 1))
     stop("Vector \"p_a\" should sum to 1.", call. = FALSE)

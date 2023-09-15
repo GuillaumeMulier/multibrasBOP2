@@ -22,7 +22,8 @@ deter_constcutoff(
   seq_tox = seq(0.01, 0.99, by = 0.02),
   seed = 1024,
   methode = 2L,
-  affich_mat = NULL
+  affich_mat = NULL,
+  Parallele = FALSE
 )
 }
 \arguments{

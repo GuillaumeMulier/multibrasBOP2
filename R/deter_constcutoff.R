@@ -120,7 +120,7 @@ get_stopbound_const <- function(ana_inter,
     if (length(prior) != 4)
       stop("\"prior\" should be a vector of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("\"prior\" should sum to 1 as it is a law of probability.", call. = FALSE)
+      warning("\"prior\" should sum to 1 as it is a law of probability.")
   }
   if (!is.matrix(mat_beta_xi) || any(dim(mat_beta_xi) != c(2, 4)))
     stop("\"mat_beta_xi\" should be a 2 by 4 matrix.", call. = FALSE)
@@ -538,7 +538,8 @@ deter_constcutoff <- function(alpha,
                               seq_tox = seq(.01, .99, by = .02),
                               seed = 1024,
                               methode = 2L,
-                              affich_mat = NULL) {
+                              affich_mat = NULL,
+                              Parallele = FALSE) {
 
   # Check arguments
   if (is.null(prior)) {
@@ -548,7 +549,7 @@ deter_constcutoff <- function(alpha,
     if (length(prior) != 4)
       stop("\"prior\" should be a vector of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("Vector \"prior\" should sum to 1.", call. = FALSE)
+      warning("Vector \"prior\" should sum to 1.")
   }
   if (alpha > 1 | alpha < 0)
     stop("Alpha-risk should be a real between 0 and 1.", call. = FALSE)
@@ -698,14 +699,15 @@ deter_constcutoff <- function(alpha,
   }
 
   # Get the type I error rate and power for each couple
-  if (future::availableCores() == 1) {
-    plan_or <- future::plan(future::sequential)
-  } else {
-    plan_or <- future::plan(future::multisession, workers = future::availableCores() - 1)
-  }
-  liste_mat <- furrr::future_map(
+  # if (future::availableCores() == 1 | !Parallele) {
+  #   plan_or <- future::plan(future::sequential)
+  # } else {
+  #   plan_or <- future::plan(future::multisession, workers = future::availableCores() - 1)
+  # }
+  liste_mat <- purrr::map(
     .x = seq_len(nrow(matrice_carac)),
     .f = function(x) {
+      if (x %% 100 == 0) cat(x, "/", nrow(matrice_carac), "\n")
       oc_tox_n <- getoc_tox_const(
         ana_inter = ana_inter,
         rand_ratio = rand_ratio,
@@ -748,7 +750,7 @@ deter_constcutoff <- function(alpha,
     }
   )
   liste_mat <- do.call("rbind", liste_mat)
-  future::plan(plan_or)
+  # future::plan(plan_or)
 
   # Column 4 = P(Reject of H0 | H1) and column 3 = P(Reject H0 | H0)
   # Determine the optimal couple
@@ -790,7 +792,7 @@ deter_constcutoff <- function(alpha,
       alpha_calc_sensvie = alpha_calc_sensvie,
       puissance_calc_sensvie = puissance_calc_sensvie
     ),
-    mat = matrice_carac
+    mat = liste_mat
   ))
 
 }

@@ -132,7 +132,7 @@ get_stopbound <- function(ana_inter,
     if (length(prior) != 4)
       stop("\"prior\" should be a vector of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("\"prior\" should sum to 1 as it is a law of probability.", call. = FALSE)
+      warning("\"prior\" should sum to 1 as it is a law of probability.")
   }
   if (!is.matrix(mat_beta_xi) || any(dim(mat_beta_xi) != c(2, 4)))
     stop("\"mat_beta_xi\" should be a 2 by 4 matrix.", call. = FALSE)
@@ -544,7 +544,8 @@ getoc_tox <- function(ana_inter,
 #' \itemize{
 #'   \item 1: trial by trial;
 #'   \item 2: trial by trial, patient by patient;
-#'   \item 3: whole in 1.
+#'   \item 3: whole in 1;
+#'   \item 4: same generation as method 2, but written in C++ for faster computations.
 #' }
 #' @param affich_mat Yes to display in console the matrix used for the choice, No for no display and default option NULL will ask you.
 #'
@@ -587,7 +588,7 @@ deter_cutoff <- function(alpha = .1,
                          cut_seq = seq(.5, 1, by = .005),
                          power_seq = seq(0, 1, by = .01),
                          seed = 1024,
-                         methode = 2L,
+                         methode = 4L,
                          affich_mat = NULL) {
 
   # Check arguments
@@ -603,7 +604,8 @@ deter_cutoff <- function(alpha = .1,
       "Choice between 3 methods with an integer:
               * 1L = trial by trial;
               * 2L = trial by trial, patient by patient;
-              * 3L = whole in 1.
+              * 3L = whole in 1;
+              * 4L = same generation as method 2, but written in C++ for faster computations.
       Speed is following: 3L > 1L > 2L.",
       call. = FALSE
     )
@@ -620,7 +622,7 @@ deter_cutoff <- function(alpha = .1,
     if (length(prior) != 4)
       stop("Vector \"prior\" should be of length 4:\n1 = Pr(Eff & Tox), 2 = Pr(Eff & no Tox), 3 = Pr(no Eff & Tox) and 4 = Pr(no Eff & no Tox).", call. = FALSE)
     if (!dplyr::near(sum(prior), 1))
-      stop("Vector \"prior\" should sum to 1.", call. = FALSE)
+      warning("Vector \"prior\" should sum to 1.")
   }
   if (!dplyr::near(sum(p_a), 1))
     stop("Vector \"p_a\" should sum to 1.", call. = FALSE)
@@ -693,135 +695,154 @@ deter_cutoff <- function(alpha = .1,
     names(multinom_ttt_H0) <- paste0("ttt", seq_len(n_bras))
   }
 
-  debut_cut <- 1 # Starting point for gamma
-  # Because the Cn function is monotonic with lambda and gamma, no need to evaluate all couples
-  matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq) + 2)
+  if (methode != 4) { # Calculs sur R
 
-  # Monoarm BOP2
-  if (n_bras == 1) {
-    # Generation of datasets under LFC and GNH
-    suppressMessages(
-      tab_h0 <- gen_patients_multinom(
-        n_sim = nsim_oc,
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        multinom_ttt = list(p_n),
-        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-        seed = seed,
-        methode = methode)
-    )
-    suppressMessages(suppressWarnings(
-      tab_h1 <- gen_patients_multinom(
-        n_sim = nsim_oc,
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        multinom_ttt = list(p_a),
-        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-        seed = seed,
-        methode = methode)
-    ))
+    debut_cut <- 1 # Starting point for gamma
+    # Because the Cn function is monotonic with lambda and gamma, no need to evaluate all couples
+    matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq) + 2)
 
-  } else { # Multiarm BOP2
-
-    # Generation of datasets under LFC and GNH
-    suppressMessages(
-      tab_h0 <- gen_patients_multinom(
-        n_sim = nsim_oc,
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        multinom_ttt = multinom_ttt_H0,
-        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-        seed = seed,
-        methode = methode)
-    )
-    suppressMessages(suppressWarnings(
-      tab_h1 <- gen_patients_multinom(
-        n_sim = nsim_oc,
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        multinom_ttt = multinom_ttt_lfc,
-        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-        seed = seed,
-        methode = methode)
-    ))
-
-  }
-
-  # Loop over lambda and gamma
-  for (j in seq_along(cut_seq)) {
-    for (k in debut_cut:length(power_seq)) {
-      oc_tox_n <- getoc_tox(
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        C_ = cut_seq[j],
-        gamm = power_seq[k],
-        liste_patients = tab_h0,
-        prior = prior,
-        p_n = p_n,
-        phi =  phi,
-        delta = delta,
-        mat_beta_xi = mat_beta_xi
+    # Monoarm BOP2
+    if (n_bras == 1) {
+      # Generation of datasets under LFC and GNH
+      suppressMessages(
+        tab_h0 <- gen_patients_multinom(
+          n_sim = nsim_oc,
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          multinom_ttt = list(p_n),
+          multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+          seed = seed,
+          methode = methode)
       )
+      suppressMessages(suppressWarnings(
+        tab_h1 <- gen_patients_multinom(
+          n_sim = nsim_oc,
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          multinom_ttt = list(p_a),
+          multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+          seed = seed,
+          methode = methode)
+      ))
 
-      if (n_bras == 1) { # Type I error rate is crossed so stop
-        if (oc_tox_n$nb_accept > alpha + 0.00) break
-      } else {
-        if (oc_tox_n$rejet_glob > alpha + 0.00) break
-      }
+    } else { # Multiarm BOP2
 
-      oc_tox_a <- getoc_tox(
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        C_ = cut_seq[j],
-        gamm = power_seq[k],
-        liste_patients = tab_h1,
-        prior = prior,
-        p_n = p_n,
-        phi = phi,
-        delta = delta,
-        mat_beta_xi = mat_beta_xi
+      # Generation of datasets under LFC and GNH
+      suppressMessages(
+        tab_h0 <- gen_patients_multinom(
+          n_sim = nsim_oc,
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          multinom_ttt = multinom_ttt_H0,
+          multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+          seed = seed,
+          methode = methode)
       )
-
-      if (n_bras == 1) {
-        matrice_carac[k,] <- c(cut_seq[j], power_seq[k], oc_tox_n$nb_accept, oc_tox_a$nb_accept)
-      } else {
-        matrice_carac[k,] <- c(cut_seq[j], power_seq[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
-      }
+      suppressMessages(suppressWarnings(
+        tab_h1 <- gen_patients_multinom(
+          n_sim = nsim_oc,
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          multinom_ttt = multinom_ttt_lfc,
+          multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+          seed = seed,
+          methode = methode)
+      ))
 
     }
-    debut_cut <- k # Restart of the loop to last value of gamma evaluated
-    if (debut_cut == length(power_seq)) {
-      matrice_carac <- matrice_carac[!is.na(matrice_carac[, 1]),]
-      break
+
+    # Loop over lambda and gamma
+    for (j in seq_along(cut_seq)) {
+      for (k in debut_cut:length(power_seq)) {
+        oc_tox_n <- getoc_tox(
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          C_ = cut_seq[j],
+          gamm = power_seq[k],
+          liste_patients = tab_h0,
+          prior = prior,
+          p_n = p_n,
+          phi =  phi,
+          delta = delta,
+          mat_beta_xi = mat_beta_xi
+        )
+
+        if (n_bras == 1) { # Type I error rate is crossed so stop
+          if (oc_tox_n$nb_accept > alpha + 0.00) break
+        } else {
+          if (oc_tox_n$rejet_glob > alpha + 0.00) break
+        }
+
+        oc_tox_a <- getoc_tox(
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          C_ = cut_seq[j],
+          gamm = power_seq[k],
+          liste_patients = tab_h1,
+          prior = prior,
+          p_n = p_n,
+          phi = phi,
+          delta = delta,
+          mat_beta_xi = mat_beta_xi
+        )
+
+        if (n_bras == 1) {
+          matrice_carac[k,] <- c(cut_seq[j], power_seq[k], oc_tox_n$nb_accept, oc_tox_a$nb_accept)
+        } else {
+          matrice_carac[k,] <- c(cut_seq[j], power_seq[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
+        }
+
+      }
+      debut_cut <- k # Restart of the loop to last value of gamma evaluated
+      if (debut_cut == length(power_seq)) {
+        matrice_carac <- matrice_carac[!is.na(matrice_carac[, 1]),]
+        break
+      }
     }
+
+    # Column 4 = P(Reject of H0 | H1) and column 3 = P(Reject H0 | H0)
+    # Determine the optimal couple
+    carac_optimale <- matrice_carac[matrice_carac[, 4] == max(matrice_carac[, 4]), ]
+    if (is.matrix(carac_optimale)) carac_optimale <- carac_optimale[1, ]
+
+    C_ <- carac_optimale[1]
+    gamma <- carac_optimale[2]
+    alpha_calc <- carac_optimale[3]
+    puissance_calc <- carac_optimale[4]
+
+    cat(paste0("Optimal couple is: lambda = ", C_, " and gamma = ", gamma, ".\n"))
+    cat(paste0("Calculated alpha-risk is ", alpha_calc, " and power is ", puissance_calc, ".\n"))
+    if (affich_mat %in% c("Yes", "yes")) print(matrice_carac)
+
+    invisible(list(
+      c(C_ = C_,
+        gamma = gamma,
+        alpha_calc = alpha_calc,
+        puissance_calc = puissance_calc),
+      mat = matrice_carac
+    ))
+
+  } else {
+
+    anas_inters_cum <- sort(union(cumsum(ana_inter), cumsum(ana_inter_tox)))
+    ana_inters      <- c(anas_inters_cum[1], diff(anas_inters_cum))
+
+    cutoff <- DeterCnm(alpha, n_bras, nsim_oc,
+                       ana_inters, cumsum(ana_inter), cumsum(ana_inter_tox),
+                       prior, p_n, p_a, phi,
+                       if (is.null(delta)) c(0, 0) else delta,
+                       cut_seq, power_seq,
+                       !is.null(delta), seed)
+    cat(paste0("Optimal couple is: lambda = ", cutoff[1], " and gamma = ", cutoff[2], ".\n"))
+    cat(paste0("Calculated alpha-risk is ", cutoff[3], " and power is ", cutoff[4], ".\n"))
+    invisible(setNames(cutoff, c("C_", "gamma", "alpha_calc", "puissance_calc")))
+
   }
-
-  # Column 4 = P(Reject of H0 | H1) and column 3 = P(Reject H0 | H0)
-  # Determine the optimal couple
-  carac_optimale <- matrice_carac[matrice_carac[, 4] == max(matrice_carac[, 4]), ]
-  if (is.matrix(carac_optimale)) carac_optimale <- carac_optimale[1, ]
-
-  C_ <- carac_optimale[1]
-  gamma <- carac_optimale[2]
-  alpha_calc <- carac_optimale[3]
-  puissance_calc <- carac_optimale[4]
-
-  cat(paste0("Optimal couple is: lambda = ", C_, " and gamma = ", gamma, ".\n"))
-  cat(paste0("Calculated alpha-risk is ", alpha_calc, " and power is ", puissance_calc, ".\n"))
-  if (affich_mat %in% c("Yes", "yes")) print(matrice_carac)
-
-  invisible(list(
-    c(C_ = C_,
-      gamma = gamma,
-      alpha_calc = alpha_calc,
-      puissance_calc = puissance_calc),
-    mat = matrice_carac
-  ))
 
 }
