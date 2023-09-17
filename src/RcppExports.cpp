@@ -61,67 +61,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// set_seed
-void set_seed(double seed);
-RcppExport SEXP _multibrasBOP2_set_seed(SEXP seedSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type seed(seedSEXP);
-    set_seed(seed);
-    return R_NilValue;
-END_RCPP
-}
-// rmultinom_1
-IntegerVector rmultinom_1(unsigned int size, NumericVector probs, unsigned int N);
-RcppExport SEXP _multibrasBOP2_rmultinom_1(SEXP sizeSEXP, SEXP probsSEXP, SEXP NSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< unsigned int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type probs(probsSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(rmultinom_1(size, probs, N));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rmultinom_rcpp
-IntegerMatrix rmultinom_rcpp(unsigned int n, unsigned int size, NumericVector probs);
-RcppExport SEXP _multibrasBOP2_rmultinom_rcpp(SEXP nSEXP, SEXP sizeSEXP, SEXP probsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type probs(probsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rmultinom_rcpp(n, size, probs));
-    return rcpp_result_gen;
-END_RCPP
-}
-// [[Rcpp::depends
-// [[Rcpp::depends(RcppEigen)]] // [[Rcpp::depends(RcppNumerical);
-RcppExport SEXP _multibrasBOP2_[[Rcpp::depends(SEXP [[Rcpp::depends(RcppNumericalSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RcppEigen)]] // >::type [[Rcpp::depends(RcppNumerical([[Rcpp::depends(RcppNumericalSEXP);
-    rcpp_result_gen = Rcpp::wrap([[Rcpp::depends([[Rcpp::depends(RcppNumerical));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GenPts
-IntegerMatrix GenPts(int NSim, IntegerVector AnaInter, NumericMatrix Probs, double Seed);
-RcppExport SEXP _multibrasBOP2_GenPts(SEXP NSimSEXP, SEXP AnaInterSEXP, SEXP ProbsSEXP, SEXP SeedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type NSim(NSimSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaInter(AnaInterSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type Probs(ProbsSEXP);
-    Rcpp::traits::input_parameter< double >::type Seed(SeedSEXP);
-    rcpp_result_gen = Rcpp::wrap(GenPts(NSim, AnaInter, Probs, Seed));
-    return rcpp_result_gen;
-END_RCPP
-}
 // [[Rcpp::depends
 // [[Rcpp::depends(RcppEigen)]] // [[Rcpp::depends(RcppNumerical);
 RcppExport SEXP _multibrasBOP2_[[Rcpp::depends(SEXP [[Rcpp::depends(RcppNumericalSEXP) {
@@ -277,11 +216,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_multibrasBOP2_set_seed", (DL_FUNC) &_multibrasBOP2_set_seed, 1},
     {"_multibrasBOP2_rmultinom_1", (DL_FUNC) &_multibrasBOP2_rmultinom_1, 3},
     {"_multibrasBOP2_rmultinom_rcpp", (DL_FUNC) &_multibrasBOP2_rmultinom_rcpp, 3},
-    {"_multibrasBOP2_GenPts", (DL_FUNC) &_multibrasBOP2_GenPts, 4},
-    {"_multibrasBOP2_set_seed", (DL_FUNC) &_multibrasBOP2_set_seed, 1},
-    {"_multibrasBOP2_rmultinom_1", (DL_FUNC) &_multibrasBOP2_rmultinom_1, 3},
-    {"_multibrasBOP2_rmultinom_rcpp", (DL_FUNC) &_multibrasBOP2_rmultinom_rcpp, 3},
-    {"_multibrasBOP2_[[Rcpp::depends", (DL_FUNC) &_multibrasBOP2_[[Rcpp::depends, 1},
     {"_multibrasBOP2_GenPts", (DL_FUNC) &_multibrasBOP2_GenPts, 4},
     {"_multibrasBOP2_[[Rcpp::depends", (DL_FUNC) &_multibrasBOP2_[[Rcpp::depends, 1},
     {"_multibrasBOP2_GetDecision", (DL_FUNC) &_multibrasBOP2_GetDecision, 5},

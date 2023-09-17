@@ -17,26 +17,6 @@ GenPts <- function(NSim, AnaInter, Probs, Seed = 1024) {
     .Call(`_multibrasBOP2_GenPts`, NSim, AnaInter, Probs, Seed)
 }
 
-set_seed <- function(seed) {
-    invisible(.Call(`_multibrasBOP2_set_seed`, seed))
-}
-
-rmultinom_1 <- function(size, probs, N) {
-    .Call(`_multibrasBOP2_rmultinom_1`, size, probs, N)
-}
-
-rmultinom_rcpp <- function(n, size, probs) {
-    .Call(`_multibrasBOP2_rmultinom_rcpp`, n, size, probs)
-}
-
-[[Rcpp::depends <- function([[Rcpp::depends(RcppNumerical) {
-    .Call(`_multibrasBOP2_[[Rcpp::depends`, [[Rcpp::depends(RcppNumerical)
-}
-
-GenPts <- function(NSim, AnaInter, Probs, Seed = 1024) {
-    .Call(`_multibrasBOP2_GenPts`, NSim, AnaInter, Probs, Seed)
-}
-
 [[Rcpp::depends <- function([[Rcpp::depends(RcppNumerical) {
     .Call(`_multibrasBOP2_[[Rcpp::depends`, [[Rcpp::depends(RcppNumerical)
 }
