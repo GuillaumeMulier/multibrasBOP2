@@ -10,6 +10,7 @@ Authors@R:
     person(given = "Lucie",
            family = "Biard",
            role = c("cre"))
+Maintainer: Guillaume Mulier <DRY12@hotmail.fr>
 Description: Simulate data with multinomial distribution and analyse them using BOP2 design, TOP design and extension of BOP2 to MAMS.
 License: MIT + file LICENSE
 Encoding: UTF-8
