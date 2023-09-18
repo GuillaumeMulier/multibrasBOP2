@@ -17,10 +17,6 @@ GenPts <- function(NSim, AnaInter, Probs, Seed = 1024) {
     .Call(`_multibrasBOP2_GenPts`, NSim, AnaInter, Probs, Seed)
 }
 
-[[Rcpp::depends <- function([[Rcpp::depends(RcppNumerical) {
-    .Call(`_multibrasBOP2_[[Rcpp::depends`, [[Rcpp::depends(RcppNumerical)
-}
-
 GetDecision <- function(AnasInters, LambdaM, GammaM, Prior, Delta) {
     .Call(`_multibrasBOP2_GetDecision`, AnasInters, LambdaM, GammaM, Prior, Delta)
 }
@@ -31,10 +27,6 @@ GetOCCnm <- function(MatPts, Prior, Phi, AnaEff, AnaTox, NbAna, LambdaM, GammaM,
 
 DeterCnm <- function(Fwer, NBras, NSim, AnaInter, AnaEff, AnaTox, Prior, PN, PA, Phi, Delta, LambdaMSeq, GammaMSeq, Control = FALSE, Seed = 1024) {
     .Call(`_multibrasBOP2_DeterCnm`, Fwer, NBras, NSim, AnaInter, AnaEff, AnaTox, Prior, PN, PA, Phi, Delta, LambdaMSeq, GammaMSeq, Control, Seed)
-}
-
-[[Rcpp::depends <- function([[Rcpp::depends(RcppNumerical) {
-    .Call(`_multibrasBOP2_[[Rcpp::depends`, [[Rcpp::depends(RcppNumerical)
 }
 
 GetDecisionCnma <- function(AnasInters, NBras, LambdaH, GammaH, LambdaMono, Prior, Delta) {

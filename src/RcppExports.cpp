@@ -61,17 +61,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// [[Rcpp::depends
-// [[Rcpp::depends(RcppEigen)]] // [[Rcpp::depends(RcppNumerical);
-RcppExport SEXP _multibrasBOP2_[[Rcpp::depends(SEXP [[Rcpp::depends(RcppNumericalSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RcppEigen)]] // >::type [[Rcpp::depends(RcppNumerical([[Rcpp::depends(RcppNumericalSEXP);
-    rcpp_result_gen = Rcpp::wrap([[Rcpp::depends([[Rcpp::depends(RcppNumerical));
-    return rcpp_result_gen;
-END_RCPP
-}
 // GetDecision
 List GetDecision(IntegerVector AnasInters, double LambdaM, double GammaM, NumericVector Prior, NumericVector Delta);
 RcppExport SEXP _multibrasBOP2_GetDecision(SEXP AnasIntersSEXP, SEXP LambdaMSEXP, SEXP GammaMSEXP, SEXP PriorSEXP, SEXP DeltaSEXP) {
@@ -130,17 +119,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type Control(ControlSEXP);
     Rcpp::traits::input_parameter< double >::type Seed(SeedSEXP);
     rcpp_result_gen = Rcpp::wrap(DeterCnm(Fwer, NBras, NSim, AnaInter, AnaEff, AnaTox, Prior, PN, PA, Phi, Delta, LambdaMSeq, GammaMSeq, Control, Seed));
-    return rcpp_result_gen;
-END_RCPP
-}
-// [[Rcpp::depends
-// [[Rcpp::depends(RcppEigen)]] // [[Rcpp::depends(RcppNumerical);
-RcppExport SEXP _multibrasBOP2_[[Rcpp::depends(SEXP [[Rcpp::depends(RcppNumericalSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RcppEigen)]] // >::type [[Rcpp::depends(RcppNumerical([[Rcpp::depends(RcppNumericalSEXP);
-    rcpp_result_gen = Rcpp::wrap([[Rcpp::depends([[Rcpp::depends(RcppNumerical));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -217,11 +195,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_multibrasBOP2_rmultinom_1", (DL_FUNC) &_multibrasBOP2_rmultinom_1, 3},
     {"_multibrasBOP2_rmultinom_rcpp", (DL_FUNC) &_multibrasBOP2_rmultinom_rcpp, 3},
     {"_multibrasBOP2_GenPts", (DL_FUNC) &_multibrasBOP2_GenPts, 4},
-    {"_multibrasBOP2_[[Rcpp::depends", (DL_FUNC) &_multibrasBOP2_[[Rcpp::depends, 1},
     {"_multibrasBOP2_GetDecision", (DL_FUNC) &_multibrasBOP2_GetDecision, 5},
     {"_multibrasBOP2_GetOCCnm", (DL_FUNC) &_multibrasBOP2_GetOCCnm, 11},
     {"_multibrasBOP2_DeterCnm", (DL_FUNC) &_multibrasBOP2_DeterCnm, 15},
-    {"_multibrasBOP2_[[Rcpp::depends", (DL_FUNC) &_multibrasBOP2_[[Rcpp::depends, 1},
     {"_multibrasBOP2_GetDecisionCnma", (DL_FUNC) &_multibrasBOP2_GetDecisionCnma, 7},
     {"_multibrasBOP2_GetOCCnma", (DL_FUNC) &_multibrasBOP2_GetOCCnma, 13},
     {"_multibrasBOP2_DeterCnma", (DL_FUNC) &_multibrasBOP2_DeterCnma, 17},
