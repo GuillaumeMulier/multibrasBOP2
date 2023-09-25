@@ -568,7 +568,7 @@ deter_cutoff_holm2 <- function(alpha = .1,
                                cut_seq_holm = seq(.5, 1, by = .005),
                                power_seq_holm = seq(0, 1, by = .01),
                                seed = 1024,
-                               methode = 2L,
+                               methode = 4L,
                                affich_mat = NULL) {
 
   if (is.null(prior)) {
@@ -583,8 +583,19 @@ deter_cutoff_holm2 <- function(alpha = .1,
     if (is.null(phi)) phi <- c(sum(p_n * mat_beta_xi[1, ]), sum(p_n * mat_beta_xi[2, ]))
   } else {
     message("Optimization vs control arm.")
+    if (is.null(phi)) phi <- c(sum(p_n * mat_beta_xi[1, ]), sum(p_n * mat_beta_xi[2, ]))
     # if (any(delta > 1) | any(delta < -1))
   }
+  if (methode %nin% c(1L, 2L, 3L, 4L))
+    stop(
+      "Choice between 4 methods with an integer:
+              * 1L = trial by trial;
+              * 2L = trial by trial, patient by patient;
+              * 3L = whole in 1;
+              * 4L = same generation as method 2, but written in C++ for faster computations.
+      Speed is following: 3L > 1L > 2L.",
+      call. = FALSE
+    )
 
   if (is.null(rand_ratio)) {
     rand_ratio <- 1
@@ -601,6 +612,7 @@ deter_cutoff_holm2 <- function(alpha = .1,
     return(affich_mat)
   }
 
+  if (methode == 4L) affich_mat <- "No"
   if (is.null(affich_mat)) affich_mat <- prompt_affich()
 
   # Bonferroni corection for multiarm settings
@@ -621,142 +633,163 @@ deter_cutoff_holm2 <- function(alpha = .1,
     as.list()
   names(multinom_ttt_H0) <- paste0("ttt", seq_len(n_bras))
 
-  # Compute threshold for monoarm BOP2
-  if (length(cut_seq_mono) == 1 & length(power_seq_mono) == 1) {
-    C_mono <- cut_seq_mono
-    gamm_mono <- power_seq_mono
-  } else {
-    carac_mono <- deter_cutoff(
-      alpha = alpha,
-      n_bras = 1,
-      bonf = FALSE,
-      nsim_oc = nsim_oc,
-      ana_inter = ana_inter,
-      ana_inter_tox = ana_inter_tox,
-      rand_ratio = rand_ratio,
-      p_n = p_n,
-      prior = prior,
-      p_a = p_a,
-      phi = phi,
-      delta = delta,
-      mat_beta_xi = mat_beta_xi,
-      cut_seq = cut_seq_mono,
-      power_seq = power_seq_mono,
-      seed = seed,
-      methode = methode,
-      affich_mat = affich_mat
-    )
-    C_mono <- carac_mono[[1]][["C_"]]
-    gamm_mono <- carac_mono[[1]][["gamma"]]
-  }
+  if (methode != 4) { # Computations in R
 
-  # Now determine the threshold's parameter for the new cutoff
-  debut_cut <- 1 # Starting point for gamma
-  # Because the Cn function is monotonic with lambda and gamma, no need to evaluate all couples
-  matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq_holm) + 2)
-  # matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq_holm) * length(cut_seq_holm))
-
-  # Generation of datasets under LFC and GNH
-  suppressMessages(
-    tab_h0 <- gen_patients_multinom(
-      n_sim = nsim_oc,
-      ana_inter = ana_inter,
-      ana_inter_tox = ana_inter_tox,
-      rand_ratio = rand_ratio,
-      multinom_ttt = multinom_ttt_H0,
-      multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-      seed = seed,
-      methode = methode)
-  )
-  suppressMessages(suppressWarnings(
-    tab_h1 <- gen_patients_multinom(
-      n_sim = nsim_oc,
-      ana_inter = ana_inter,
-      ana_inter_tox = ana_inter_tox,
-      rand_ratio = rand_ratio,
-      multinom_ttt = multinom_ttt_lfc,
-      multinom_cont = if (is.null(delta)) {NULL} else {p_n},
-      seed = seed,
-      methode = methode)
-  ))
-
-  cut_seq_holm <- sort(cut_seq_holm, decreasing = TRUE)
-  # Due to other form of Cn, Cn is now increasing with lambda, so in order to decrease alpha risk at next iteration we need
-  # to lower lambda. Thus working in reverse order of lambda in the loop
-  # Loop over lambda and gamma
-  for (j in seq_along(cut_seq_holm)) {
-    for (k in debut_cut:length(power_seq_holm)) {
-      # for (k in 1:length(power_seq_holm)) {
-      # print(paste0("C=", j, "/G=", k))
-      oc_tox_n <- getoc_tox_holm2(
+    # Compute threshold for monoarm BOP2
+    if (length(cut_seq_mono) == 1 & length(power_seq_mono) == 1) {
+      C_mono <- cut_seq_mono
+      gamm_mono <- power_seq_mono
+    } else {
+      carac_mono <- deter_cutoff(
+        alpha = alpha,
+        n_bras = 1,
+        bonf = FALSE,
+        nsim_oc = nsim_oc,
         ana_inter = ana_inter,
         ana_inter_tox = ana_inter_tox,
         rand_ratio = rand_ratio,
-        m = n_bras,
-        C_holm = cut_seq_holm[j],
-        gamm_holm = power_seq_holm[k],
-        C_mono = C_mono,
-        gamm_mono = gamm_mono,
-        liste_patients = tab_h0,
-        prior = prior,
         p_n = p_n,
-        phi =  phi,
-        delta = delta,
-        mat_beta_xi = mat_beta_xi
-      )
-
-      if (oc_tox_n$rejet_glob > alpha + 0.00) break
-
-      oc_tox_a <- getoc_tox_holm2(
-        ana_inter = ana_inter,
-        ana_inter_tox = ana_inter_tox,
-        rand_ratio = rand_ratio,
-        m = n_bras,
-        C_holm = cut_seq_holm[j],
-        gamm_holm = power_seq_holm[k],
-        C_mono = C_mono,
-        gamm_mono = gamm_mono,
-        liste_patients = tab_h1,
         prior = prior,
-        p_n = p_n,
+        p_a = p_a,
         phi = phi,
         delta = delta,
-        mat_beta_xi = mat_beta_xi
+        mat_beta_xi = mat_beta_xi,
+        cut_seq = cut_seq_mono,
+        power_seq = power_seq_mono,
+        seed = seed,
+        methode = methode,
+        affich_mat = affich_mat
       )
-
-      matrice_carac[k,] <- c(cut_seq_holm[j], power_seq_holm[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
-      # matrice_carac[ (j - 1) * length(power_seq_holm) + k,] <- c(cut_seq_holm[j], power_seq_holm[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
-
+      C_mono <- carac_mono[[1]][["C_"]]
+      gamm_mono <- carac_mono[[1]][["gamma"]]
     }
-    debut_cut <- k # Restart of the loop to last value of gamma evaluated
-    if (debut_cut == length(power_seq_holm)) break
+
+    # Now determine the threshold's parameter for the new cutoff
+    debut_cut <- 1 # Starting point for gamma
+    # Because the Cn function is monotonic with lambda and gamma, no need to evaluate all couples
+    matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq_holm) + 2)
+    # matrice_carac <- matrix(numeric(0), ncol = 4, nrow = length(power_seq_holm) * length(cut_seq_holm))
+
+    # Generation of datasets under LFC and GNH
+    suppressMessages(
+      tab_h0 <- gen_patients_multinom(
+        n_sim = nsim_oc,
+        ana_inter = ana_inter,
+        ana_inter_tox = ana_inter_tox,
+        rand_ratio = rand_ratio,
+        multinom_ttt = multinom_ttt_H0,
+        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+        seed = seed,
+        methode = methode)
+    )
+    suppressMessages(suppressWarnings(
+      tab_h1 <- gen_patients_multinom(
+        n_sim = nsim_oc,
+        ana_inter = ana_inter,
+        ana_inter_tox = ana_inter_tox,
+        rand_ratio = rand_ratio,
+        multinom_ttt = multinom_ttt_lfc,
+        multinom_cont = if (is.null(delta)) {NULL} else {p_n},
+        seed = seed,
+        methode = methode)
+    ))
+
+    cut_seq_holm <- sort(cut_seq_holm, decreasing = TRUE)
+    # Due to other form of Cn, Cn is now increasing with lambda, so in order to decrease alpha risk at next iteration we need
+    # to lower lambda. Thus working in reverse order of lambda in the loop
+    # Loop over lambda and gamma
+    for (j in seq_along(cut_seq_holm)) {
+      for (k in debut_cut:length(power_seq_holm)) {
+        # for (k in 1:length(power_seq_holm)) {
+        # print(paste0("C=", j, "/G=", k))
+        oc_tox_n <- getoc_tox_holm2(
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          m = n_bras,
+          C_holm = cut_seq_holm[j],
+          gamm_holm = power_seq_holm[k],
+          C_mono = C_mono,
+          gamm_mono = gamm_mono,
+          liste_patients = tab_h0,
+          prior = prior,
+          p_n = p_n,
+          phi =  phi,
+          delta = delta,
+          mat_beta_xi = mat_beta_xi
+        )
+
+        if (oc_tox_n$rejet_glob > alpha + 0.00) break
+
+        oc_tox_a <- getoc_tox_holm2(
+          ana_inter = ana_inter,
+          ana_inter_tox = ana_inter_tox,
+          rand_ratio = rand_ratio,
+          m = n_bras,
+          C_holm = cut_seq_holm[j],
+          gamm_holm = power_seq_holm[k],
+          C_mono = C_mono,
+          gamm_mono = gamm_mono,
+          liste_patients = tab_h1,
+          prior = prior,
+          p_n = p_n,
+          phi = phi,
+          delta = delta,
+          mat_beta_xi = mat_beta_xi
+        )
+
+        matrice_carac[k,] <- c(cut_seq_holm[j], power_seq_holm[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
+        # matrice_carac[ (j - 1) * length(power_seq_holm) + k,] <- c(cut_seq_holm[j], power_seq_holm[k], oc_tox_n$rejet_glob, oc_tox_a$rejet_ttt1)
+
+      }
+      debut_cut <- k # Restart of the loop to last value of gamma evaluated
+      if (debut_cut == length(power_seq_holm)) break
+    }
+
+    matrice_carac <- matrice_carac[!is.na(matrice_carac[, 1]),]
+
+    # Column 4 = P(Reject of H0 | H1) and column 3 = P(Reject H0 | H0)
+    # Determine the optimal couple
+    carac_optimale <- matrice_carac[matrice_carac[, 4] == max(matrice_carac[, 4]), ]
+    if (is.matrix(carac_optimale)) carac_optimale <- carac_optimale[1, ]
+
+    C_holm <- carac_optimale[1]
+    gamma_holm <- carac_optimale[2]
+    alpha_calc <- carac_optimale[3]
+    puissance_calc <- carac_optimale[4]
+
+    cat(paste0("Optimal couple is: lambda = ", C_holm, " and gamma = ", gamma_holm, ".\n"))
+    cat(paste0("Optimal couple for mono-arm BOP2 is: lambda = ", C_mono, " and gamma = ", gamm_mono, ".\n"))
+    cat(paste0("Calculated alpha-risk is ", alpha_calc, " and power is ", puissance_calc, ".\n"))
+    if (affich_mat %in% c("Yes", "yes")) print(matrice_carac)
+
+    invisible(list(
+      c(C_holm = C_holm,
+        gamma_holm = gamma_holm,
+        C_mono = C_mono,
+        gamma_mono = gamm_mono,
+        alpha_calc = alpha_calc,
+        puissance_calc = puissance_calc),
+      mat = matrice_carac
+    ))
+
+  } else { # Computations in C++
+
+    anas_inters_cum <- sort(union(cumsum(ana_inter), cumsum(ana_inter_tox)))
+    ana_inters      <- c(anas_inters_cum[1], diff(anas_inters_cum))
+    if (is.null(ana_inter_tox)) ana_inter_tox <- ana_inter
+    cutoff <- DeterCnma(alpha, n_bras, nsim_oc,
+                        ana_inters, cumsum(ana_inter), cumsum(ana_inter_tox),
+                        prior, p_n, p_a, phi,
+                        if (is.null(delta)) c(0, 0) else delta,
+                        cut_seq_holm, power_seq_holm, cut_seq_mono, power_seq_mono,
+                        !is.null(delta), seed)
+    cat(paste0("Optimal couple is: lambda = ", cutoff[1], " and gamma = ", cutoff[2], ".\n"))
+    cat(paste0("Optimal couple for mono-arm BOP2 is: lambda = ", cutoff[3], " and gamma = ", cutoff[4], ".\n"))
+    cat(paste0("Calculated alpha-risk is ", cutoff[5], " and power is ", cutoff[6], ".\n"))
+    invisible(list(setNames(cutoff, c("C_holm", "gamma_holm", "C_mono", "gamma_mono", "alpha_calc", "puissance_calc"))))
+
   }
 
-  matrice_carac <- matrice_carac[!is.na(matrice_carac[, 1]),]
-
-  # Column 4 = P(Reject of H0 | H1) and column 3 = P(Reject H0 | H0)
-  # Determine the optimal couple
-  carac_optimale <- matrice_carac[matrice_carac[, 4] == max(matrice_carac[, 4]), ]
-  if (is.matrix(carac_optimale)) carac_optimale <- carac_optimale[1, ]
-
-  C_holm <- carac_optimale[1]
-  gamma_holm <- carac_optimale[2]
-  alpha_calc <- carac_optimale[3]
-  puissance_calc <- carac_optimale[4]
-
-  cat(paste0("Optimal couple is: lambda = ", C_holm, " and gamma = ", gamma_holm, ".\n"))
-  cat(paste0("Optimal couple for mono-arm BOP2 is: lambda = ", C_mono, " and gamma = ", gamm_mono, ".\n"))
-  cat(paste0("Calculated alpha-risk is ", alpha_calc, " and power is ", puissance_calc, ".\n"))
-  if (affich_mat %in% c("Yes", "yes")) print(matrice_carac)
-
-  invisible(list(
-    c(C_holm = C_holm,
-      gamma_holm = gamma_holm,
-      C_mono = C_mono,
-      gamma_mono = gamm_mono,
-      alpha_calc = alpha_calc,
-      puissance_calc = puissance_calc),
-    mat = matrice_carac
-  ))
 
 }

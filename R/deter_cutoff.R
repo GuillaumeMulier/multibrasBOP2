@@ -599,9 +599,9 @@ deter_cutoff <- function(alpha = .1,
   if (n_bras <= 0 | n_bras %% 1 != 0)
     stop("Number of arms should be an integer >= 1.", call. = FALSE)
   if (!is.null(affich_mat)) affich_mat <- match.arg(affich_mat, c("Yes", "yes", "No", "no"))
-  if (methode %nin% c(1L, 2L, 3L))
+  if (methode %nin% c(1L, 2L, 3L, 4L))
     stop(
-      "Choice between 3 methods with an integer:
+      "Choice between 4 methods with an integer:
               * 1L = trial by trial;
               * 2L = trial by trial, patient by patient;
               * 3L = whole in 1;
@@ -646,6 +646,7 @@ deter_cutoff <- function(alpha = .1,
     if (is.null(phi)) phi <- c(sum(p_n * mat_beta_xi[1, ]), sum(p_n * mat_beta_xi[2, ]))
   } else {
     message("Optimization vs control arm.")
+    if (is.null(phi)) phi <- c(sum(p_n * mat_beta_xi[1, ]), sum(p_n * mat_beta_xi[2, ]))
     if (any(delta > 1) | any(delta < -1))
       stop("\"delta\" should be a real between -1 and 1.", call. = FALSE)
   }
@@ -673,6 +674,7 @@ deter_cutoff <- function(alpha = .1,
     return(affich_mat)
   }
 
+  if (methode == 4L) affich_mat <- "No"
   if (is.null(affich_mat)) affich_mat <- prompt_affich()
 
   # Bonferroni corection for multiarm settings
@@ -832,6 +834,7 @@ deter_cutoff <- function(alpha = .1,
 
     anas_inters_cum <- sort(union(cumsum(ana_inter), cumsum(ana_inter_tox)))
     ana_inters      <- c(anas_inters_cum[1], diff(anas_inters_cum))
+    if (is.null(ana_inter_tox)) ana_inter_tox <- ana_inter
 
     cutoff <- DeterCnm(alpha, n_bras, nsim_oc,
                        ana_inters, cumsum(ana_inter), cumsum(ana_inter_tox),
@@ -841,7 +844,7 @@ deter_cutoff <- function(alpha = .1,
                        !is.null(delta), seed)
     cat(paste0("Optimal couple is: lambda = ", cutoff[1], " and gamma = ", cutoff[2], ".\n"))
     cat(paste0("Calculated alpha-risk is ", cutoff[3], " and power is ", cutoff[4], ".\n"))
-    invisible(setNames(cutoff, c("C_", "gamma", "alpha_calc", "puissance_calc")))
+    invisible(list(setNames(cutoff, c("C_", "gamma", "alpha_calc", "puissance_calc"))))
 
   }
 

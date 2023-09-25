@@ -11,42 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// set_seed
-void set_seed(double seed);
-RcppExport SEXP _multibrasBOP2_set_seed(SEXP seedSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type seed(seedSEXP);
-    set_seed(seed);
-    return R_NilValue;
-END_RCPP
-}
-// rmultinom_1
-IntegerVector rmultinom_1(unsigned int size, NumericVector probs, unsigned int N);
-RcppExport SEXP _multibrasBOP2_rmultinom_1(SEXP sizeSEXP, SEXP probsSEXP, SEXP NSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< unsigned int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type probs(probsSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(rmultinom_1(size, probs, N));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rmultinom_rcpp
-IntegerMatrix rmultinom_rcpp(unsigned int n, unsigned int size, NumericVector probs);
-RcppExport SEXP _multibrasBOP2_rmultinom_rcpp(SEXP nSEXP, SEXP sizeSEXP, SEXP probsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type probs(probsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rmultinom_rcpp(n, size, probs));
-    return rcpp_result_gen;
-END_RCPP
-}
 // GenPts
 IntegerMatrix GenPts(int NSim, IntegerVector AnaInter, NumericMatrix Probs, double Seed);
 RcppExport SEXP _multibrasBOP2_GenPts(SEXP NSimSEXP, SEXP AnaInterSEXP, SEXP ProbsSEXP, SEXP SeedSEXP) {
@@ -58,42 +22,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type Probs(ProbsSEXP);
     Rcpp::traits::input_parameter< double >::type Seed(SeedSEXP);
     rcpp_result_gen = Rcpp::wrap(GenPts(NSim, AnaInter, Probs, Seed));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GetDecision
-List GetDecision(IntegerVector AnasInters, double LambdaM, double GammaM, NumericVector Prior, NumericVector Delta);
-RcppExport SEXP _multibrasBOP2_GetDecision(SEXP AnasIntersSEXP, SEXP LambdaMSEXP, SEXP GammaMSEXP, SEXP PriorSEXP, SEXP DeltaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type AnasInters(AnasIntersSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaM(LambdaMSEXP);
-    Rcpp::traits::input_parameter< double >::type GammaM(GammaMSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prior(PriorSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Delta(DeltaSEXP);
-    rcpp_result_gen = Rcpp::wrap(GetDecision(AnasInters, LambdaM, GammaM, Prior, Delta));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GetOCCnm
-NumericMatrix GetOCCnm(IntegerMatrix MatPts, NumericVector Prior, NumericVector Phi, IntegerVector AnaEff, IntegerVector AnaTox, int NbAna, double LambdaM, double GammaM, List Decisions, bool Control, NumericVector Delta);
-RcppExport SEXP _multibrasBOP2_GetOCCnm(SEXP MatPtsSEXP, SEXP PriorSEXP, SEXP PhiSEXP, SEXP AnaEffSEXP, SEXP AnaToxSEXP, SEXP NbAnaSEXP, SEXP LambdaMSEXP, SEXP GammaMSEXP, SEXP DecisionsSEXP, SEXP ControlSEXP, SEXP DeltaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type MatPts(MatPtsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prior(PriorSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Phi(PhiSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaEff(AnaEffSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaTox(AnaToxSEXP);
-    Rcpp::traits::input_parameter< int >::type NbAna(NbAnaSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaM(LambdaMSEXP);
-    Rcpp::traits::input_parameter< double >::type GammaM(GammaMSEXP);
-    Rcpp::traits::input_parameter< List >::type Decisions(DecisionsSEXP);
-    Rcpp::traits::input_parameter< bool >::type Control(ControlSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Delta(DeltaSEXP);
-    rcpp_result_gen = Rcpp::wrap(GetOCCnm(MatPts, Prior, Phi, AnaEff, AnaTox, NbAna, LambdaM, GammaM, Decisions, Control, Delta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -119,46 +47,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type Control(ControlSEXP);
     Rcpp::traits::input_parameter< double >::type Seed(SeedSEXP);
     rcpp_result_gen = Rcpp::wrap(DeterCnm(Fwer, NBras, NSim, AnaInter, AnaEff, AnaTox, Prior, PN, PA, Phi, Delta, LambdaMSeq, GammaMSeq, Control, Seed));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GetDecisionCnma
-List GetDecisionCnma(IntegerVector AnasInters, int NBras, double LambdaH, double GammaH, double LambdaMono, NumericVector Prior, NumericVector Delta);
-RcppExport SEXP _multibrasBOP2_GetDecisionCnma(SEXP AnasIntersSEXP, SEXP NBrasSEXP, SEXP LambdaHSEXP, SEXP GammaHSEXP, SEXP LambdaMonoSEXP, SEXP PriorSEXP, SEXP DeltaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type AnasInters(AnasIntersSEXP);
-    Rcpp::traits::input_parameter< int >::type NBras(NBrasSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaH(LambdaHSEXP);
-    Rcpp::traits::input_parameter< double >::type GammaH(GammaHSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaMono(LambdaMonoSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prior(PriorSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Delta(DeltaSEXP);
-    rcpp_result_gen = Rcpp::wrap(GetDecisionCnma(AnasInters, NBras, LambdaH, GammaH, LambdaMono, Prior, Delta));
-    return rcpp_result_gen;
-END_RCPP
-}
-// GetOCCnma
-NumericMatrix GetOCCnma(IntegerMatrix MatPts, NumericVector Prior, NumericVector Phi, IntegerVector AnaInter, IntegerVector AnaEff, IntegerVector AnaTox, int NbAna, double LambdaH, double GammaH, double LambdaMono, List Decisions, bool Control, NumericVector Delta);
-RcppExport SEXP _multibrasBOP2_GetOCCnma(SEXP MatPtsSEXP, SEXP PriorSEXP, SEXP PhiSEXP, SEXP AnaInterSEXP, SEXP AnaEffSEXP, SEXP AnaToxSEXP, SEXP NbAnaSEXP, SEXP LambdaHSEXP, SEXP GammaHSEXP, SEXP LambdaMonoSEXP, SEXP DecisionsSEXP, SEXP ControlSEXP, SEXP DeltaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type MatPts(MatPtsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prior(PriorSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Phi(PhiSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaInter(AnaInterSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaEff(AnaEffSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type AnaTox(AnaToxSEXP);
-    Rcpp::traits::input_parameter< int >::type NbAna(NbAnaSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaH(LambdaHSEXP);
-    Rcpp::traits::input_parameter< double >::type GammaH(GammaHSEXP);
-    Rcpp::traits::input_parameter< double >::type LambdaMono(LambdaMonoSEXP);
-    Rcpp::traits::input_parameter< List >::type Decisions(DecisionsSEXP);
-    Rcpp::traits::input_parameter< bool >::type Control(ControlSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Delta(DeltaSEXP);
-    rcpp_result_gen = Rcpp::wrap(GetOCCnma(MatPts, Prior, Phi, AnaInter, AnaEff, AnaTox, NbAna, LambdaH, GammaH, LambdaMono, Decisions, Control, Delta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -191,15 +79,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_multibrasBOP2_set_seed", (DL_FUNC) &_multibrasBOP2_set_seed, 1},
-    {"_multibrasBOP2_rmultinom_1", (DL_FUNC) &_multibrasBOP2_rmultinom_1, 3},
-    {"_multibrasBOP2_rmultinom_rcpp", (DL_FUNC) &_multibrasBOP2_rmultinom_rcpp, 3},
     {"_multibrasBOP2_GenPts", (DL_FUNC) &_multibrasBOP2_GenPts, 4},
-    {"_multibrasBOP2_GetDecision", (DL_FUNC) &_multibrasBOP2_GetDecision, 5},
-    {"_multibrasBOP2_GetOCCnm", (DL_FUNC) &_multibrasBOP2_GetOCCnm, 11},
     {"_multibrasBOP2_DeterCnm", (DL_FUNC) &_multibrasBOP2_DeterCnm, 15},
-    {"_multibrasBOP2_GetDecisionCnma", (DL_FUNC) &_multibrasBOP2_GetDecisionCnma, 7},
-    {"_multibrasBOP2_GetOCCnma", (DL_FUNC) &_multibrasBOP2_GetOCCnma, 13},
     {"_multibrasBOP2_DeterCnma", (DL_FUNC) &_multibrasBOP2_DeterCnma, 17},
     {NULL, NULL, 0}
 };

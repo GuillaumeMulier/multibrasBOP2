@@ -22,7 +22,7 @@ deter_cutoff(
   cut_seq = seq(0.5, 1, by = 0.005),
   power_seq = seq(0, 1, by = 0.01),
   seed = 1024,
-  methode = 2L,
+  methode = 4L,
   affich_mat = NULL
 )
 }
@@ -63,7 +63,8 @@ of comparison to a reference value).}
 \itemize{
 \item 1: trial by trial;
 \item 2: trial by trial, patient by patient;
-\item 3: whole in 1.
+\item 3: whole in 1;
+\item 4: same generation as method 2, but written in C++ for faster computations.
 }}
 
 \item{affich_mat}{Yes to display in console the matrix used for the choice, No for no display and default option NULL will ask you.}
