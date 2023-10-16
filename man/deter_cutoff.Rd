@@ -74,11 +74,11 @@ Displaying in console of the result.
 If stocked in an object, a list:
 \itemize{
 \item the optimal couple λ/γ and α-risk and power a priori;
-\item the matrix of the choices.
+\item the matrix of the choices (not available in C++).
 }
 }
 \description{
-Optimization of lambda and gamma in threshold Cn = 1 - λ * (n / N) ^ γ.
+Optimization of λ and γ in threshold Cn = 1 - λ * (n / N) ^ γ.
 }
 \details{
 2 situations:
@@ -100,7 +100,7 @@ carac_opt <- deter_cutoff(alpha = 0.1,
                           affich_mat = "No")
 carac_opt[[1]]
 
-# A trial with 3 arms with the same hypotheses
+# A trial with 3 arms
 carac_opt <- deter_cutoff(alpha = 0.1,
                           ana_inter = rep(15, 4),
                           p_n = c(0.1, 0.2, 0.2, 0.5),
@@ -110,4 +110,9 @@ carac_opt <- deter_cutoff(alpha = 0.1,
                           bonf = FALSE)
 carac_opt[[1]]
 
+}
+\references{
+Zhou, H., Lee, J. J., & Yuan, Y. (2017). BOP2: Bayesian optimal design for phase II clinical trials with simple and complex endpoints. Statistics in Medicine, 36: 3302-3314.
+
+Lin, R., Coleman, R. L., and Yuan, Y. (2020). TOP: Time-to-event Bayesian optimal phase II trial design for cancer immunotherapy. Journal of the National Cancer Institute 112, 38-45.
 }

@@ -73,6 +73,13 @@ max_resp <- function(cutoff,
 #'
 #' Given a couple &lambda;/&gamma;, give the table of stopping boundaries at each interim analysis.
 #'
+#' Decision rules are of the form:
+#'
+#' \itemize{
+#'    \item stop for futility if Pr(p eff <= &phi; eff | Dn) > 1 - &lambda; * (n / N) ^ &gamma;
+#'    \item stop for toxicity if Pr(p tox > &phi; tox | Dn) > 1 - &lambda; * (n / N) ^ &gamma;
+#' }
+#'
 #' Generate the stopping boundaries table different given the situation:
 #' \itemize{
 #'   \item against a fixed reference value: a data.frame with thresholds at each interim analysis. nb_ana give the number of patients at each
@@ -504,7 +511,7 @@ getoc_tox <- function(ana_inter,
 
 #' Threshold's optimization
 #'
-#' Optimization of lambda and gamma in threshold Cn = 1 - &lambda; * (n / N) ^ &gamma;.
+#' Optimization of &lambda; and &gamma; in threshold Cn = 1 - &lambda; * (n / N) ^ &gamma;.
 #'
 #' 2 situations:
 #' \itemize{
@@ -520,7 +527,7 @@ getoc_tox <- function(ana_inter,
 #' If stocked in an object, a list:
 #' \itemize{
 #'   \item the optimal couple &lambda;/&gamma; and &alpha;-risk and power a priori;
-#'   \item the matrix of the choices.
+#'   \item the matrix of the choices (not available in C++).
 #' }
 #'
 #' @param alpha Maximal type I error rate.
@@ -551,6 +558,9 @@ getoc_tox <- function(ana_inter,
 #'
 #' @encoding UTF-8
 #'
+#' @references Zhou, H., Lee, J. J., & Yuan, Y. (2017). BOP2: Bayesian optimal design for phase II clinical trials with simple and complex endpoints. Statistics in Medicine, 36: 3302-3314.
+#' @references Lin, R., Coleman, R. L., and Yuan, Y. (2020). TOP: Time-to-event Bayesian optimal phase II trial design for cancer immunotherapy. Journal of the National Cancer Institute 112, 38-45.
+#'
 #' @examples
 #' # The trial mimicked in the article of Zhou et al., 2017
 #' carac_opt <- deter_cutoff(alpha = 0.1,
@@ -561,7 +571,7 @@ getoc_tox <- function(ana_inter,
 #'                           affich_mat = "No")
 #' carac_opt[[1]]
 #'
-#' # A trial with 3 arms with the same hypotheses
+#' # A trial with 3 arms
 #' carac_opt <- deter_cutoff(alpha = 0.1,
 #'                           ana_inter = rep(15, 4),
 #'                           p_n = c(0.1, 0.2, 0.2, 0.5),

@@ -3,6 +3,16 @@
 #'
 #' Given a couple &lambda;/&gamma;, give the table of stopping boundaries at each interim analysis.
 #'
+#' Decision rules are of the form:
+#'
+#' \itemize{
+#'    \item stop for futility if Pr(p eff <= &phi; eff | Dn) > 1 - (&eta; - &lambda;) / &eta; * (n / N) ^ &gamma;
+#'    \item stop for toxicity if Pr(p tox > &phi; tox | Dn) > 1 - (&eta; - &lambda;) / &eta; * (n / N) ^ &gamma;
+#' }
+#'
+#' with n the number of patients in arm k at the interim analysis, N the maximum number of patients to be recruited in arm k and &eta; = K + 1 - a
+#' (a is the number of active arms at interim analysis k and K the total number of arms).
+#'
 #' Generate the stopping boundaries table different given the situation:
 #' \itemize{
 #'   \item against a fixed reference value: a data.frame with thresholds at each interim analysis. nb_ana give the number of patients at each
@@ -34,13 +44,13 @@
 #' @examples
 #' # Example for uncontrolled design
 #' get_stopbound_holm2(ana_inter = rep(15, 4),
-#'                     C_ = 0.535, gamm = 0.98, m = 3,
+#'                     C_holm = 0.535, gamm_holm = 0.8, C_mono = 0.63, gamm_mono = 0.93, m = 3,
 #'                     p_n = c(0.15, 0.3, 0.15, 0.4))
 #'
 #' # Example for controlled design
 #' get_stopbound_holm2(ana_inter = rep(15, 4),
-#'                     C_ = 0.65, gamm = 0.8, m = 3,
-#'                     p_n = c(0.15, 0.3, 0.15, 0.4),
+#'                     C_holm = 0.55, gamm_holm = 0.99, C_mono = 0.575, gamm_mono = 0.98, m = 3,
+#'                     p_n = c(.3, .3, .1, .3),
 #'                     delta = c(0, 0))
 #'
 #' @export
@@ -489,6 +499,7 @@ getoc_tox_holm2 <- function(ana_inter,
 #'
 #' Optimization of lambda and gamma in threshold Cn = 1 - (&eta; - &lambda;) / &eta; * (n / N) ^ &gamma;, with &eta; = K + 1 - k, K the number of arms (not counting control arm) and k the number of still active arms.
 #' To ensure to control the type I error rate in the individual arms, at the final analysis, the threshold taken is min(CN, 1 - &lamba;_monoarm) ensuring a not too loose cutoff.
+#' If the hyperparameters for monoarm threshold are not provided, they are optimized too before the optimization of the hyperparameters for multiple arms.
 #'
 #' 2 situations:
 #' \itemize{
@@ -503,8 +514,8 @@ getoc_tox_holm2 <- function(ana_inter,
 #' Displaying in console of the result.
 #' If stocked in an object, a list:
 #' \itemize{
-#'   \item the optimal couple &lambda;/&gamma; and &alpha;-risk and power a priori;
-#'   \item the matrix of the choices.
+#'   \item the optimal couple &lambda;_holm/&gamma;_holm for the multiarm threshold, &lambda;_mono/&gamma;_mono for the monoarm threshold and &alpha;-risk and power a priori;
+#'   \item the matrix of the choices (not returned if made in C++).
 #' }
 #'
 #' @param alpha Maximal type I error rate.
@@ -531,7 +542,8 @@ getoc_tox_holm2 <- function(ana_inter,
 #' \itemize{
 #'   \item 1: trial by trial;
 #'   \item 2: trial by trial, patient by patient;
-#'   \item 3: whole in 1.
+#'   \item 3: whole in 1;
+#'   \item 4: same as method 2 but in C++ to gain lot of time.
 #' }
 #' @param affich_mat Yes to display in console the matrix used for the choice, No for no display and default option NULL will ask you.
 #'

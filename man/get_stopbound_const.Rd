@@ -22,7 +22,7 @@ get_stopbound_const(
 \item{rand_ratio}{Number or numeric vector representing the ratio between the number of patients in treatment arms and control arm (or some reference sample size in case
 of comparison to a reference value). 1 by default for all groups.}
 
-\item{seuils}{The 2 constant probability thresholds for efficacy and toxicity.}
+\item{seuils}{The 2 constant probability thresholds for efficacy and toxicity. In fact, we give (1 - gamma_eff, 1 - gamma_tox).}
 
 \item{p_n}{Law of probability under the inefficacy/toxicity hypothesis.}
 
@@ -34,10 +34,7 @@ of comparison to a reference value). 1 by default for all groups.}
 
 \item{delta}{Minimal desirable difference of effect if compared with a control arm. If no control group, leave NULL. Should be between -1 and 1.}
 }
-\description{
-Get the table of stopping boundaries for a given couple of thresholds.
-}
-\details{
+\value{
 Generation of a table for stopping boundaries. It can be:
 \itemize{
 \item for a design vs a reference value: a data.frame with the number of patients at each interim analysis with efficacy's thresholds (stop for futility if
@@ -50,8 +47,19 @@ y_cont non toxicities in the control group). If all groups aren't of the same si
 ttt indicating what treatment group the tresholds are for.
 }
 }
+\description{
+Get the table of stopping boundaries for a given couple of thresholds gamma.
+}
+\details{
+Decision rules are of the form:
+
+\itemize{
+\item stop for futility if Pr(p eff <= φ eff | Dn) > γ_eff
+\item stop for toxicity if Pr(p tox > φ tox | Dn) > γ_tox
+}
+}
 \examples{
-# To get the table of stopping boundaries vs a given reference value
+# To get the table of stopping boundaries vs a given reference value with gamma_eff = 0.33 and gamma_tox = 0.61
 get_stopbound_const(ana_inter = rep(10, 4),
                     seuils = c(.67, .39),
                     p_n = c(.15, .3, .15, .4))

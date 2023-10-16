@@ -50,6 +50,16 @@ of comparison to a reference value). Not yet implemented.}
 Given a couple λ/γ, give the table of stopping boundaries at each interim analysis.
 }
 \details{
+Decision rules are of the form:
+
+\itemize{
+\item stop for futility if Pr(p eff <= φ eff | Dn) > 1 - (η - λ) / η * (n / N) ^ γ
+\item stop for toxicity if Pr(p tox > φ tox | Dn) > 1 - (η - λ) / η * (n / N) ^ γ
+}
+
+with n the number of patients in arm k at the interim analysis, N the maximum number of patients to be recruited in arm k and η = K + 1 - a
+(a is the number of active arms at interim analysis k and K the total number of arms).
+
 Generate the stopping boundaries table different given the situation:
 \itemize{
 \item against a fixed reference value: a data.frame with thresholds at each interim analysis. nb_ana give the number of patients at each
@@ -63,13 +73,13 @@ in the control group. seuil_eff and seuil_notox works in the same way as above.
 \examples{
 # Example for uncontrolled design
 get_stopbound_holm2(ana_inter = rep(15, 4),
-                    C_ = 0.535, gamm = 0.98, m = 3,
+                    C_holm = 0.535, gamm_holm = 0.8, C_mono = 0.63, gamm_mono = 0.93, m = 3,
                     p_n = c(0.15, 0.3, 0.15, 0.4))
 
 # Example for controlled design
 get_stopbound_holm2(ana_inter = rep(15, 4),
-                    C_ = 0.65, gamm = 0.8, m = 3,
-                    p_n = c(0.15, 0.3, 0.15, 0.4),
+                    C_holm = 0.55, gamm_holm = 0.99, C_mono = 0.575, gamm_mono = 0.98, m = 3,
+                    p_n = c(.3, .3, .1, .3),
                     delta = c(0, 0))
 
 }

@@ -23,11 +23,12 @@
 #'
 #' @param n_sim The desired number of simulated trials.
 #' @param ana_inter Vector giving the number of additional patients at each interim analysis. If ana_inter_tox is supplied, represents the vector for efficacy interim analyses.
+#' Else both efficacy and toxicity analyses are considered at the same time.
 #' @param ana_inter_tox Vector of the number of additional patients at each interim analysis for toxicity. If analyses for effficacy and toxicity occur at the same
 #' number of patients, set it to NULL.
 #' @param rand_ratio Number or numeric vector representing the ratio between the number of patients in treatment arms and control arm (or some reference sample size in case
 #' of comparison to a reference value).
-#' @param multinom_cont Vector of length 4 describing the multinomial law followed by the control group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
+#' @param multinom_cont Vector of length 4 describing the multinomial distribution followed by the control group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
 #' If no control group, let it set to default NULL.
 #' @param multinom_ttt A list of vectors of length 4 describing the multinomial law followed by each treatment group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
 #' If only one treatment group, one can just specify a vector of length 4.
@@ -37,7 +38,8 @@
 #' \itemize{
 #'   \item 1: trial by trial;
 #'   \item 2: trial by trial, patient by patient;
-#'   \item 3: whole in 1.
+#'   \item 3: whole in 1;
+#'   \item 4: like method 2, but in C++ to be faster.
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -90,13 +92,14 @@ gen_patients_multinom <- function(n_sim,
     stop("\"ana_inter\" should be a vector of positive integers.", call. = FALSE)
   if (!is.matrix(mat_beta_xi) || any(dim(mat_beta_xi) != c(2, 4)))
     stop("\"mat_beta_xi\" should be a 2 by 4 matrix.", call. = FALSE)
-  if (methode %nin% c(1L, 2L, 3L))
+  if (methode %nin% c(1L, 2L, 3L, 4L))
     stop(
       "Choice between 3 methods with an integer:
               * 1L = trial by trial;
               * 2L = trial by trial, patient by patient;
-              * 3L = whole in 1.
-      Speed is following: 3L > 1L > 2L.",
+              * 3L = whole in 1;
+              * 4L = like method 2, but in C++ to be faster.
+      Speed is following: 4L > 3L > 1L > 2L.",
       call. = FALSE
     )
 
@@ -187,8 +190,10 @@ gen_patients_multinom <- function(n_sim,
     data.frame(nb_ana = as.integer(seq_along(x)),
                nb_patients = x)
   })
-  set.seed(seed)
-  on.exit(set.seed(NULL), add = TRUE) # Reset the seed to not impair the environment with the use of the function
+  if (methode != 4L) {
+    set.seed(seed)
+    on.exit(set.seed(NULL), add = TRUE) # Reset the seed to not impair the environment with the use of the function
+  }
 
   if (methode == 3L) {
 
@@ -323,6 +328,12 @@ gen_patients_multinom <- function(n_sim,
       dplyr::ungroup() %>%
       dplyr::mutate(tot_eff = efftox + effnotox,
                     tot_notox = effnotox + noeffnotox)
+
+  } else if (methode == 4) {
+
+    liste_patients <- GenPts(n_sim, anas_inters[[1]], matrix(unlist(proba), ncol = 4, byrow = TRUE), seed)
+    liste_patients <- as.data.frame(liste_patients)
+    colnames(liste_patients) <- c("ttt", "n_sim", "nb_ana", "tot_pat", "efftox", "effnotox", "noefftox", "noeffnotox", "tot_eff", "tot_notox")
 
   }
 

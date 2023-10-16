@@ -35,6 +35,8 @@
 #'
 #' @seealso \code{\link{gen_patients_multinomTOP}}
 #'
+#' @references Lin, R., Coleman, R. L., and Yuan, Y. (2020). TOP: Time-to-event Bayesian optimal phase II trial design for cancer immunotherapy. Journal of the National Cancer Institute 112, 38-45.
+#'
 #' @examples
 #' # Run a trial of 80 patients with 3 interim analyses, 5 patients per month and 6 months
 #' # of observation for efficacy and toxicity

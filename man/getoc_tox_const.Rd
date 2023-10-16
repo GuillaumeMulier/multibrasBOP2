@@ -2,7 +2,7 @@
 % Please edit documentation in R/deter_constcutoff.R
 \name{getoc_tox_const}
 \alias{getoc_tox_const}
-\title{Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials/}
+\title{Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials.}
 \usage{
 getoc_tox_const(
   ana_inter,
@@ -37,5 +37,5 @@ of comparison to a reference value). 1 by default for all groups.}
 \item{n_sim}{Number of simulated trials.}
 }
 \description{
-Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials/
+Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials.
 }

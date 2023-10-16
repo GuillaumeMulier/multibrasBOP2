@@ -24,7 +24,7 @@ deter_cutoff_holm2(
   cut_seq_holm = seq(0.5, 1, by = 0.005),
   power_seq_holm = seq(0, 1, by = 0.01),
   seed = 1024,
-  methode = 2L,
+  methode = 4L,
   affich_mat = NULL
 )
 }
@@ -68,7 +68,8 @@ but take the given value as hyperparameter.}
 \itemize{
 \item 1: trial by trial;
 \item 2: trial by trial, patient by patient;
-\item 3: whole in 1.
+\item 3: whole in 1;
+\item 4: same as method 2 but in C++ to gain lot of time.
 }}
 
 \item{affich_mat}{Yes to display in console the matrix used for the choice, No for no display and default option NULL will ask you.}
@@ -79,13 +80,14 @@ but take the given value as hyperparameter.}
 Displaying in console of the result.
 If stocked in an object, a list:
 \itemize{
-\item the optimal couple λ/γ and α-risk and power a priori;
-\item the matrix of the choices.
+\item the optimal couple λ_holm/γ_holm for the multiarm threshold, λ_mono/γ_mono for the monoarm threshold and α-risk and power a priori;
+\item the matrix of the choices (not returned if made in C++).
 }
 }
 \description{
 Optimization of lambda and gamma in threshold Cn = 1 - (η - λ) / η * (n / N) ^ γ, with η = K + 1 - k, K the number of arms (not counting control arm) and k the number of still active arms.
 To ensure to control the type I error rate in the individual arms, at the final analysis, the threshold taken is min(CN, 1 - &lamba;_monoarm) ensuring a not too loose cutoff.
+If the hyperparameters for monoarm threshold are not provided, they are optimized too before the optimization of the hyperparameters for multiple arms.
 }
 \details{
 2 situations:

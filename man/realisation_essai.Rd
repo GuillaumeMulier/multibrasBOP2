@@ -68,6 +68,9 @@ realisation_essai(ana_inter = rep(20, 4),
                   C_ = .62, gamm = .99,
                   interpatient = 6, max_teff = 180, max_ttox = 180)
 }
+\references{
+Lin, R., Coleman, R. L., and Yuan, Y. (2020). TOP: Time-to-event Bayesian optimal phase II trial design for cancer immunotherapy. Journal of the National Cancer Institute 112, 38-45.
+}
 \seealso{
 \code{\link{gen_patients_multinomTOP}}
 }

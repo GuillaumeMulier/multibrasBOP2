@@ -87,7 +87,7 @@ mean number of patients/responses/toxicities in each arm, proportion of early st
 }
 }
 \description{
-Obtain the operating characteristics for BOP2 vs a reference value or a control group.
+Obtain the operating characteristics for BOP2 threshold vs a reference value or a control group.
 }
 \details{
 Optimize Cn and then simulate \code{nsim_essais} with law \code{p_reel} to determine the operating characteristics. It is possible to optimize

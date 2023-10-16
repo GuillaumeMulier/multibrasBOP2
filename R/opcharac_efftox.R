@@ -1,6 +1,6 @@
 #' Operating characteristics
 #'
-#' Obtain the operating characteristics for BOP2 vs a reference value or a control group.
+#' Obtain the operating characteristics for BOP2 threshold vs a reference value or a control group.
 #'
 #' Optimize Cn and then simulate \code{nsim_essais} with law \code{p_reel} to determine the operating characteristics. It is possible to optimize
 #' Cn before with \code{deter_cutoff} and then supply these values as argument in \code{power_seq} and \code{cut_seq}. It allows reduction of the execution

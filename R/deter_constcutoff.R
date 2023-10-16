@@ -67,8 +67,18 @@ max_resp_const <- function(cutoff,
 
 #' Stopping boundaries for constant threshold
 #'
-#' Get the table of stopping boundaries for a given couple of thresholds.
+#' @description
+#' Get the table of stopping boundaries for a given couple of thresholds gamma.
 #'
+#' @details
+#' Decision rules are of the form:
+#'
+#' \itemize{
+#'    \item stop for futility if Pr(p eff <= &phi; eff | Dn) > &gamma;_eff
+#'    \item stop for toxicity if Pr(p tox > &phi; tox | Dn) > &gamma;_tox
+#' }
+#'
+#' @returns
 #' Generation of a table for stopping boundaries. It can be:
 #' \itemize{
 #'   \item for a design vs a reference value: a data.frame with the number of patients at each interim analysis with efficacy's thresholds (stop for futility if
@@ -86,7 +96,7 @@ max_resp_const <- function(cutoff,
 #' @param ana_inter Vector giving the number of additional patients at each interim analysis.
 #' @param rand_ratio Number or numeric vector representing the ratio between the number of patients in treatment arms and control arm (or some reference sample size in case
 #' of comparison to a reference value). 1 by default for all groups.
-#' @param seuils The 2 constant probability thresholds for efficacy and toxicity.
+#' @param seuils The 2 constant probability thresholds for efficacy and toxicity. In fact, we give (1 - gamma_eff, 1 - gamma_tox).
 #' @param p_n Law of probability under the inefficacy/toxicity hypothesis.
 #' @param prior Prior for the law of probability (by default, skeptical: the inefficacy/toxicity hypothesis).
 #' @param mat_beta_xi The link matrix between outcomes of the multinomial distribution and endpoints (efficacy and non toxicity /!\).
@@ -96,7 +106,7 @@ max_resp_const <- function(cutoff,
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' # To get the table of stopping boundaries vs a given reference value
+#' # To get the table of stopping boundaries vs a given reference value with gamma_eff = 0.33 and gamma_tox = 0.61
 #' get_stopbound_const(ana_inter = rep(10, 4),
 #'                     seuils = c(.67, .39),
 #'                     p_n = c(.15, .3, .15, .4))
@@ -312,7 +322,7 @@ get_stopbound_const <- function(ana_inter,
 }
 
 
-#' Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials/
+#' Get the operating characteristics for a given couple gamma_eff/gamma_tox et a given list of trials.
 #'
 #' @param n_sim Number of simulated trials.
 #' @param ana_inter Vector giving the number of additional patients at each interim analysis.
@@ -486,7 +496,7 @@ getoc_tox_const <- function(ana_inter,
 #' @param p_a Law of probability under the efficacy/non toxicity hypothesis.
 #' @param nsim_oc Number of simulated trials.
 #' @param seed Seed for \code{rmultinom}.
-#' @param methode Method used to generate the data:
+#' @param methode Method used to generate the data (C++ implementation is not available for the constant threshold):
 #' \itemize{
 #'   \item 1: trial by trial;
 #'   \item 2: trial by trial, patient by patient;
@@ -538,8 +548,7 @@ deter_constcutoff <- function(alpha,
                               seq_tox = seq(.01, .99, by = .02),
                               seed = 1024,
                               methode = 2L,
-                              affich_mat = NULL,
-                              Parallele = FALSE) {
+                              affich_mat = NULL) {
 
   # Check arguments
   if (is.null(prior)) {
@@ -707,7 +716,7 @@ deter_constcutoff <- function(alpha,
   liste_mat <- purrr::map(
     .x = seq_len(nrow(matrice_carac)),
     .f = function(x) {
-      if (x %% 100 == 0) cat(x, "/", nrow(matrice_carac), "\n")
+      # if (x %% 100 == 0) cat(x, "/", nrow(matrice_carac), "\n")
       oc_tox_n <- getoc_tox_const(
         ana_inter = ana_inter,
         rand_ratio = rand_ratio,

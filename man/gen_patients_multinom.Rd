@@ -20,7 +20,8 @@ gen_patients_multinom(
 \arguments{
 \item{n_sim}{The desired number of simulated trials.}
 
-\item{ana_inter}{Vector giving the number of additional patients at each interim analysis. If ana_inter_tox is supplied, represents the vector for efficacy interim analyses.}
+\item{ana_inter}{Vector giving the number of additional patients at each interim analysis. If ana_inter_tox is supplied, represents the vector for efficacy interim analyses.
+Else both efficacy and toxicity analyses are considered at the same time.}
 
 \item{ana_inter_tox}{Vector of the number of additional patients at each interim analysis for toxicity. If analyses for effficacy and toxicity occur at the same
 number of patients, set it to NULL.}
@@ -28,7 +29,7 @@ number of patients, set it to NULL.}
 \item{rand_ratio}{Number or numeric vector representing the ratio between the number of patients in treatment arms and control arm (or some reference sample size in case
 of comparison to a reference value).}
 
-\item{multinom_cont}{Vector of length 4 describing the multinomial law followed by the control group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
+\item{multinom_cont}{Vector of length 4 describing the multinomial distribution followed by the control group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
 If no control group, let it set to default NULL.}
 
 \item{multinom_ttt}{A list of vectors of length 4 describing the multinomial law followed by each treatment group ("Eff/Tox", "Eff/NoTox", "NoEff/Tox", "NoEff/NoTox").
@@ -42,7 +43,8 @@ If only one treatment group, one can just specify a vector of length 4.}
 \itemize{
 \item 1: trial by trial;
 \item 2: trial by trial, patient by patient;
-\item 3: whole in 1.
+\item 3: whole in 1;
+\item 4: like method 2, but in C++ to be faster.
 }}
 }
 \value{

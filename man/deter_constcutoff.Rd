@@ -22,8 +22,7 @@ deter_constcutoff(
   seq_tox = seq(0.01, 0.99, by = 0.02),
   seed = 1024,
   methode = 2L,
-  affich_mat = NULL,
-  Parallele = FALSE
+  affich_mat = NULL
 )
 }
 \arguments{
@@ -56,7 +55,7 @@ of comparison to a reference value). Not currently implemented.}
 
 \item{seed}{Seed for \code{rmultinom}.}
 
-\item{methode}{Method used to generate the data:
+\item{methode}{Method used to generate the data (C++ implementation is not available for the constant threshold):
 \itemize{
 \item 1: trial by trial;
 \item 2: trial by trial, patient by patient;

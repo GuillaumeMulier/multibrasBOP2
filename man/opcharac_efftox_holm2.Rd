@@ -88,7 +88,7 @@ mean number of patients/responses/toxicities in each arm, proportion of early st
 }
 }
 \description{
-Obtain the operating characteristics for BOP2 vs a reference value with correction in function of remaining active arms for cutoff determination.
+Obtain the operating characteristics for BOP2 like threshold vs a reference value or control group with correction in function of remaining active arms for cutoff determination.
 }
 \details{
 Optimize Cn and then simulate \code{nsim_essais} with law \code{p_reel} to determine the operating characteristics. It is possible to optimize
@@ -96,4 +96,5 @@ Cn before with \code{deter_cutoff} and then supply these values as argument in \
 if we want to simulate several scenarios with the same Cn.
 
 The default form of Cn is 1 - (η - λ) / η * (n / N) ^ γ with η = K + 1 - k, K the number of arms and k the number of active arms.
+At final analysis, the threshold is corrected with the monoarm threshold to maintain arm-specific type I error rate.
 }

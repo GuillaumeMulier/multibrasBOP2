@@ -43,6 +43,13 @@ of comparison to a reference value).}
 Given a couple λ/γ, give the table of stopping boundaries at each interim analysis.
 }
 \details{
+Decision rules are of the form:
+
+\itemize{
+\item stop for futility if Pr(p eff <= φ eff | Dn) > 1 - λ * (n / N) ^ γ
+\item stop for toxicity if Pr(p tox > φ tox | Dn) > 1 - λ * (n / N) ^ γ
+}
+
 Generate the stopping boundaries table different given the situation:
 \itemize{
 \item against a fixed reference value: a data.frame with thresholds at each interim analysis. nb_ana give the number of patients at each
